@@ -40,7 +40,7 @@ class UserRole(models.Model):
 class Actualite(models.Model):
     titre = models.CharField(max_length=30)
     contenu = models.TextField()
-    media= models.ImageField(upload_to='media/')
+    media= models.ImageField(upload_to='media_actualite/')
     date = models.DateField()
     type = models.CharField(max_length=20)
     user = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
@@ -61,7 +61,7 @@ class Evenement(models.Model):
     titre = models.CharField(max_length=30)
     description = models.TextField()
     date = models.DateField()
-    media= models.ImageField(upload_to='media/')
+    media= models.ImageField(upload_to='media_evenement/')
     type = models.CharField(max_length=20)
     #fichier = models.FileField(upload_to='media/')
     user = models.ForeignKey(CustomUser,null=True,on_delete=models.CASCADE)
@@ -73,7 +73,7 @@ class RessourceIslamique(models.Model):
     titre = models.CharField(max_length=30)
     contenu = models.TextField()
     type = models.CharField(max_length=20)
-    fichier= models.ImageField(upload_to='media/')
+    fichier= models.ImageField(upload_to='media_ressourceIslamique/')
     user = models.ForeignKey(CustomUser,null=True,on_delete=models.CASCADE)
     def __str__(self):
         return self.titre
