@@ -1,16 +1,17 @@
 from django.shortcuts import render
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .models import CustomUser,Role,UserRole,Actualite,Evenement,Archive,RessourceIslamique,RappelIslamique
-from .serializers import CustomUserSerializer, RoleSerializer, ActualiteSerializer, EvenementSerializer, \
+from .models import Role,UserRole,Actualite,Evenement,Archive,RessourceIslamique,RappelIslamique
+from .serializers import  RoleSerializer, ActualiteSerializer, EvenementSerializer, \
     UserRoleSerializer, ArchiveSerializer, RappelIslamiqueSerializer, RessourceIslamiqueSerializer
 
 
 # Create your views here.
 
-class CustomUserViewSet(viewsets.ModelViewSet):
-    queryset = CustomUser.objects.all()
-    serializer_class = CustomUserSerializer
+#register
+
+
 
 class RoleViewSet(viewsets.ModelViewSet):
     queryset = Role.objects.all()
@@ -23,6 +24,7 @@ class ActualiteViewSet(viewsets.ModelViewSet):
 class EvenementViewSet(viewsets.ModelViewSet):
     queryset = Evenement.objects.all()
     serializer_class = EvenementSerializer
+    permission_classes = [IsAuthenticated]
 
 class UserRoleViewSet(viewsets.ModelViewSet):
     queryset = UserRole.objects.all()

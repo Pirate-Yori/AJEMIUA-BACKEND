@@ -1,5 +1,4 @@
 asgiref==3.8.1
-dj-rest-auth==7.0.1
 Django==5.2.8
 django-filter==25.2
 djangorestframework==3.16.1
@@ -10,3 +9,8 @@ whitenoise==6.11.0
 django-filter
 django-cors-headers
 Pillow
+djangorestframework-simplejwt
+djangorestframework-simplejwt[blacklist]
+drf-yasg
+
+

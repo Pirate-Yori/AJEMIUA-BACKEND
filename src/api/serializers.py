@@ -1,12 +1,7 @@
 from rest_framework import serializers
 
-from .models import Role,CustomUser,RappelIslamique,Archive,Actualite,RessourceIslamique,UserRole,Evenement
+from .models import Role,RappelIslamique,Archive,Actualite,RessourceIslamique,UserRole,Evenement
 
-class CustomUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CustomUser
-        fields = '__all__'
-        read_only_fields = ('id','date_joined','roles',)
 
 class RappelIslamiqueSerializer(serializers.ModelSerializer):
     class Meta:

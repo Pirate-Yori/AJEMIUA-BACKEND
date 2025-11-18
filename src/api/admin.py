@@ -1,11 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import CustomUser
+from django.conf import settings
 
 
 # Register your models here.
 
-@admin.register(CustomUser)
-class CustomUserAdmin(admin.ModelAdmin):
-    fields = ('matricule', 'telephone', 'username', 'password')

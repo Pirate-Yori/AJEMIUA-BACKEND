@@ -1,9 +1,10 @@
+from django.urls import path
 from rest_framework import routers
 
-from .views import CustomUserViewSet, RoleViewSet, ActualiteViewSet, EvenementViewSet,ArchiveViewSet,RappelIslamiqueViewSet,RessourceIslamiqueViewSet,UserRoleViewSet
+from .views import  RoleViewSet, ActualiteViewSet, EvenementViewSet,ArchiveViewSet,RappelIslamiqueViewSet,RessourceIslamiqueViewSet,UserRoleViewSet
 
 router = routers.DefaultRouter()
-router.register('users',CustomUserViewSet)
+
 
 #route pour les roles here
 router.register('roles',RoleViewSet)
