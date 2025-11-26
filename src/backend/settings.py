@@ -53,7 +53,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'backend.wsgi.application'
+WSGI_APPLICATION = 'src.backend.wsgi.application'
 
 
 # Source - https://stackoverflow.com/a
