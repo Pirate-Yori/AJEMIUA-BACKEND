@@ -8,6 +8,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-44u7p=wqn9n(@8ifz3%l0wy$4eti5%pekf=rvk@hu&fvk1iz29'
 env = environ.Env()
 environ.Env.read_env()
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'src.backend.settings')
+
 ALLOWED_HOSTS = ['https://ajemiua-backend.onrender.com/']
 DEBUG=False
 
