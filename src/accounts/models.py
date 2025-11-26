@@ -28,19 +28,13 @@ class CustomUserManager(BaseUserManager):
 class CustomUser(AbstractUser):
     username = None  # on supprime le champ username
 
-    ROLE_CHOICES = [
-        ('admin', 'Admin'),
-        ('secretaire', 'Secrétaire'),
-        ('tresorier', 'Trésorier'),
-        ('membre', 'Membre'),
-    ]
 
     matricule = models.CharField(max_length=15, unique=True, null=True, blank=True)
     telephone = models.CharField(max_length=15, unique=True, null=True, blank=True)
     nom = models.CharField(max_length=15)
     prenom = models.CharField(max_length=15)
     date_joined = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=12, choices=ROLE_CHOICES, default='membre')
+
 
     roles = models.ManyToManyField('api.Role', related_name='utilisateurs')
 

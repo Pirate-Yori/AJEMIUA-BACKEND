@@ -1,10 +1,13 @@
 from pathlib import Path
-from datetime import timedelta
-import os
 
+import os
+import environ
+import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-xxxx'
+SECRET_KEY = 'django-insecure-44u7p=wqn9n(@8ifz3%l0wy$4eti5%pekf=rvk@hu&fvk1iz29'
+env = environ.Env()
+environ.Env.read_env()
 DEBUG = True
 ALLOWED_HOSTS = []
 
@@ -50,12 +53,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
+
+# Source - https://stackoverflow.com/a
+# Posted by drziff, modified by community. See post 'Timeline' for change history
+# Retrieved 2025-11-19, License - CC BY-SA 4.0
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default':dj_database_url.parse(env('DATABASE_URL'))
 }
+
 
 AUTH_USER_MODEL = "accounts.CustomUser"
 
@@ -98,6 +104,9 @@ SIMPLE_JWT = {
 }
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
