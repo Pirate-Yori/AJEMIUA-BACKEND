@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-44u7p=wqn9n(@8ifz3%l0wy$4eti5%pekf=rvk@hu&fvk1iz29'
 env = environ.Env()
 environ.Env.read_env()
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
@@ -104,11 +104,14 @@ SIMPLE_JWT = {
 }
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [
+
+STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
-]
+)
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_AUTH_SERIALIZERS = {
