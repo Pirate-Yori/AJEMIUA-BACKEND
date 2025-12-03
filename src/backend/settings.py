@@ -6,12 +6,9 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-44u7p=wqn9n(@8ifz3%l0wy$4eti5%pekf=rvk@hu&fvk1iz29'
-env = environ.Env()
-environ.Env.read_env()
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'src.backend.settings')
+DEBUG = True
 
-ALLOWED_HOSTS = ['https://ajemiua-backend.onrender.com/']
-DEBUG=False
+ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -53,7 +50,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'src.backend.wsgi.application'
+WSGI_APPLICATION = 'backend.wsgi.application'
 
 
 # Source - https://stackoverflow.com/a
@@ -61,7 +58,10 @@ WSGI_APPLICATION = 'src.backend.wsgi.application'
 # Retrieved 2025-11-19, License - CC BY-SA 4.0
 
 DATABASES = {
-    'default':dj_database_url.parse(env('DATABASE_URL'))
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
 
 
