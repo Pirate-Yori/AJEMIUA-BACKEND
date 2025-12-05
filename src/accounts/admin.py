@@ -9,3 +9,4 @@ class CustomUserAdmin(admin.ModelAdmin):
     def get_roles(self, obj):
         return ", ".join([role.nom for role in obj.roles.all()])
     get_roles.short_description = "Rôles"
+

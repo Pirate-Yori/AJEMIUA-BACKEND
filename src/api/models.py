@@ -13,7 +13,7 @@ class UserRole(models.Model):
     role = models.ForeignKey('Role',on_delete=models.CASCADE)
     date_attribution = models.DateTimeField(auto_now_add=True)
 
-     #Ici ca veut qu'on peut pas avoir deux mm enregistrementd
+     #Ici ca veut qu'on peut pas avoir deux mm enregistrements
 
     def str(self):
             return f"{self.user.matricule}--{self.role.type}"

@@ -6,10 +6,25 @@ from rest_framework import serializers
 from .models import CustomUser
 
 class CustomUserSerializer(serializers.ModelSerializer):
-
+    """
+    Serializer pour les utilisateurs (exclut le mot de passe)
+    """
     class Meta:
         model = CustomUser
-        fields = "__all__"
+        fields = ["id", "matricule", "nom", "prenom", "telephone", "email", 
+                  "date_joined", "is_member", "is_admin", "is_active", "is_staff", "roles"]
+        read_only_fields = ["id", "date_joined"]
+
+
+class AdminUserSerializer(serializers.ModelSerializer):
+    """
+    Serializer pour l'admin avec plus de détails
+    """
+    class Meta:
+        model = CustomUser
+        fields = ["id", "matricule", "nom", "prenom", "telephone", "email", 
+                  "date_joined", "is_member", "is_admin", "is_active", "is_staff", "roles"]
+        read_only_fields = ["id", "date_joined"]
 
 class UserRegisterationSerializer(serializers.ModelSerializer):
 
@@ -30,16 +45,34 @@ class UserRegisterationSerializer(serializers.ModelSerializer):
         )
 
 class UserLoginSerializer(serializers.Serializer):
-    """
-    Serializer class to authenticate users with email and password.
-    """
-
     matricule = serializers.CharField()
     password = serializers.CharField(write_only=True)
 
     def validate(self, data):
-        user = authenticate(**data)
-        if user and user.is_active:
-            return user
-        raise serializers.ValidationError("Incorrect Credentials")
+        user = authenticate(matricule=data["matricule"], password=data["password"])
+
+        if user is None:
+            raise serializers.ValidationError("Matricule ou mot de passe incorrect.")
+
+        data["user"] = user
+        return data
+
+class AdminLoginSerializer(serializers.Serializer):
+    matricule = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        user = authenticate(matricule=data["matricule"], password=data["password"])
+
+        if user is None:
+            raise serializers.ValidationError("Identifiants incorrects.")
+
+        if not user.is_admin:
+            raise serializers.ValidationError("Vous n'êtes pas autorisé.")
+
+        data["user"] = user
+        return data
+
+
+
 
