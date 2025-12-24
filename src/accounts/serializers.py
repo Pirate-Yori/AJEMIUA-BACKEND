@@ -9,22 +9,62 @@ class CustomUserSerializer(serializers.ModelSerializer):
     """
     Serializer pour les utilisateurs (exclut le mot de passe)
     """
+    date_joined = serializers.DateTimeField(read_only=True)
+    
     class Meta:
         model = CustomUser
-        fields = ["id", "matricule", "nom", "prenom", "telephone", "email", 
-                  "date_joined", "is_member", "is_admin", "is_active", "is_staff", "roles"]
+        fields = [
+            "id",
+            "matricule",
+            "nom",
+            "prenom",
+            "telephone",
+            "date_joined",
+            "is_member",
+            "password_changed",
+            "roles",
+        ]
         read_only_fields = ["id", "date_joined"]
+        
+    def to_internal_value(self, data):
+        """
+        Ignore date_joined s'il est envoyé dans la requête (protection)
+        """
+        if isinstance(data, dict) and 'date_joined' in data:
+            data = data.copy()
+            data.pop('date_joined', None)
+        return super().to_internal_value(data)
 
 
 class AdminUserSerializer(serializers.ModelSerializer):
     """
     Serializer pour l'admin avec plus de détails
     """
+    date_joined = serializers.DateTimeField(read_only=True)
+    
     class Meta:
         model = CustomUser
-        fields = ["id", "matricule", "nom", "prenom", "telephone", "email", 
-                  "date_joined", "is_member", "is_admin", "is_active", "is_staff", "roles"]
+        fields = [
+            "id",
+            "matricule",
+            "nom",
+            "prenom",
+            "telephone",
+            "date_joined",
+            "is_member",
+            "password_changed",
+            "roles",
+        ]
         read_only_fields = ["id", "date_joined"]
+        
+    def to_internal_value(self, data):
+        """
+        Ignore date_joined s'il est envoyé dans la requête (protection)
+        """
+        if isinstance(data, dict) and 'date_joined' in data:
+            data = data.copy()
+            data.pop('date_joined', None)
+        return super().to_internal_value(data)
 
 class UserRegisterationSerializer(serializers.ModelSerializer):
 
@@ -67,7 +107,8 @@ class AdminLoginSerializer(serializers.Serializer):
         if user is None:
             raise serializers.ValidationError("Identifiants incorrects.")
 
-        if not user.is_admin:
+        # Seuls les utilisateurs ayant le rôle "admin" peuvent se connecter à l'interface admin
+        if not user.roles.filter(type__iexact="admin").exists():
             raise serializers.ValidationError("Vous n'êtes pas autorisé.")
 
         data["user"] = user

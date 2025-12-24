@@ -6,74 +6,53 @@ from .models import CustomUser
 
 
 @receiver(post_save, sender=CustomUser)
-def notify_admin_on_new_user(sender, instance, created, **kwargs):
+def assign_default_role_to_new_user(sender, instance, created, **kwargs):
     """
-    Envoie une notification aux administrateurs lorsqu'un nouvel utilisateur s'inscrit.
+    Assigner automatiquement le rôle "étudiant" à chaque nouvel utilisateur.
     """
-    if created and not instance.is_member:
-        # Récupérer tous les administrateurs
-        admins = CustomUser.objects.filter(is_admin=True, is_active=True)
+    if created:
+        from api.models import Role
         
-        if admins.exists():
-            # Préparer le message
-            subject = f"Nouvelle demande d'inscription - {instance.matricule}"
-            message = f"""
-Bonjour,
+        # Créer ou récupérer le rôle "étudiant" par défaut
+        etudiant_role, _ = Role.objects.get_or_create(type="étudiant")
+        
+        # Assigner le rôle à l'utilisateur s'il ne l'a pas déjà
+        if not instance.roles.filter(type="étudiant").exists():
+            instance.roles.add(etudiant_role)
 
-Un nouvel utilisateur a fait une demande d'inscription :
 
-- Matricule: {instance.matricule}
-- Nom: {instance.nom}
-- Prénom: {instance.prenom}
-- Téléphone: {instance.telephone}
-- Date d'inscription: {instance.date_joined.strftime('%d/%m/%Y à %H:%M')}
-
-Veuillez approuver cet utilisateur en mettant is_member à True pour qu'il puisse se connecter.
-
-Cordialement,
-Système de gestion
-            """
-            
-            # Récupérer les emails des admins
-            admin_emails = [admin.email for admin in admins if admin.email]
-            
-            # Si aucun email n'est configuré, on peut logger ou utiliser une autre méthode
-            if admin_emails:
-                try:
-                    send_mail(
-                        subject=subject,
-                        message=message,
-                        from_email=settings.DEFAULT_FROM_EMAIL if hasattr(settings, 'DEFAULT_FROM_EMAIL') else 'noreply@example.com',
-                        recipient_list=admin_emails,
-                        fail_silently=False,
-                    )
-                except Exception as e:
-                    # Si l'envoi d'email échoue, on peut logger l'erreur
-                    print(f"Erreur lors de l'envoi de l'email aux admins: {e}")
-            else:
-                # Si les admins n'ont pas d'email, on peut logger l'information
-                print(f"NOUVELLE INSCRIPTION - Matricule: {instance.matricule}, Nom: {instance.nom} {instance.prenom}")
-                print(f"Les administrateurs n'ont pas d'adresse email configurée.")
+# Signal de notification supprimé - les utilisateurs sont maintenant créés uniquement par l'admin
 
 
 @receiver(post_migrate)
-def create_default_admin(sender, **kwargs):
+def create_default_roles_and_admin(sender, **kwargs):
     """
-    Crée automatiquement un administrateur par défaut après les migrations.
+    Crée automatiquement les rôles par défaut et un administrateur après les migrations.
     """
     # Vérifier que c'est bien l'app accounts qui a migré
     if sender.name == 'accounts':
+        from api.models import Role
+
+        # Créer les rôles par défaut s'ils n'existent pas
+        etudiant_role, _ = Role.objects.get_or_create(type="étudiant")
+        admin_role, _ = Role.objects.get_or_create(type="admin")
+        
+        print(f"✅ Rôles par défaut créés/vérifiés: 'étudiant', 'admin'")
+
+        # Créer l'administrateur par défaut s'il n'existe pas
         if not CustomUser.objects.filter(matricule="ADMIN001").exists():
             try:
-                admin = CustomUser.objects.create_superuser(
+                admin = CustomUser.objects.create_user(
                     matricule="ADMIN001",
                     nom="Admin",
                     prenom="System",
                     telephone="0000000000",
-                    password="adminpassword"
+                    password="adminpassword",
                 )
-                # S'assurer que l'admin est aussi membre pour pouvoir se connecter
-                admin.is_member = True
+                # Donner le rôle admin
+                admin.roles.add(admin_role)
+                admin.is_member = True  # Admin actif par défaut
+                admin.password_changed = True  # L'admin peut garder son mot de passe par défaut
                 admin.save()
                 print("✅ Administrateur par défaut créé avec succès!")
                 print("   Matricule: ADMIN001")

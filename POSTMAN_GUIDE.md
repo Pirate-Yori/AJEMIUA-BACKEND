@@ -1,50 +1,14 @@
-# Guide de Test Postman - API AJEMIUA
+# Guide Postman - API AJEMIUA
 
-## Configuration de base
-- **URL de base** : `http://127.0.0.1:8000` ou `http://localhost:8000`
-- **Headers par défaut** : `Content-Type: application/json`
+**URL de base** : `http://127.0.0.1:8000`
 
 ---
 
-## 📝 ÉTAPE 1 : INSCRIPTION D'UN UTILISATEUR
+## 🔐 1. CONNEXION ADMIN
 
-### 1.1 Inscription d'un nouvel utilisateur
-**Méthode** : `POST`  
-**URL** : `http://127.0.0.1:8000/register/`  
-**Headers** :
-```
-Content-Type: application/json
-```
-**Body (raw JSON)** :
-```json
-{
-    "matricule": "MAT001",
-    "nom": "Doe",
-    "prenom": "John",
-    "telephone": "1234567890",
-    "password": "password123"
-}
-```
+**POST** `http://127.0.0.1:8000/auth/admin/login/`
 
-**Réponse attendue** (201 Created) :
-```json
-{
-    "message": "Votre inscription a été reçue. Un administrateur doit valider votre compte."
-}
-```
-
----
-
-## 🔐 ÉTAPE 2 : CONNEXION ADMIN
-
-### 2.1 Connexion Admin
-**Méthode** : `POST`  
-**URL** : `http://127.0.0.1:8000/auth/admin/login/`  
-**Headers** :
-```
-Content-Type: application/json
-```
-**Body (raw JSON)** :
+**Body (JSON)** :
 ```json
 {
     "matricule": "ADMIN001",
@@ -52,332 +16,95 @@ Content-Type: application/json
 }
 ```
 
-**Réponse attendue** (200 OK) :
-```json
-{
-    "admin": {
-        "id": 1,
-        "matricule": "ADMIN001",
-        "nom": "Admin",
-        "prenom": "User",
-        "telephone": "0987654321",
-        "email": null,
-        "date_joined": "2024-01-01T00:00:00Z",
-        "is_member": true,
-        "is_admin": true,
-        "is_active": true,
-        "is_staff": true,
-        "roles": []
-    },
-    "tokens": {
-        "refresh": "eyJ0eXAiOiJKV1QiLCJhbGc...",
-        "access": "eyJ0eXAiOiJKV1QiLCJhbGc..."
-    }
-}
-```
-
-**⚠️ IMPORTANT** : Copiez le `access` token pour les requêtes suivantes !
+**Réponse** : Copier le `access` token pour les requêtes suivantes.
 
 ---
 
-## 👥 ÉTAPE 3 : GESTION DES UTILISATEURS (ADMIN)
+## 👥 2. GESTION UTILISATEURS (ADMIN)
 
-### 3.1 Liste tous les utilisateurs
-**Méthode** : `GET`  
-**URL** : `http://127.0.0.1:8000/auth/admin/users/`  
-**Headers** :
-```
-Content-Type: application/json
-Authorization: Bearer <ACCESS_TOKEN>
-```
+### Liste tous les utilisateurs
+**GET** `http://127.0.0.1:8000/auth/admin/users/`  
+**Headers** : `Authorization: Bearer <ACCESS_TOKEN>`
 
-**Réponse attendue** (200 OK) :
-```json
-[
-    {
-        "id": 2,
-        "matricule": "MAT001",
-        "nom": "Doe",
-        "prenom": "John",
-        "telephone": "1234567890",
-        "email": null,
-        "date_joined": "2024-01-01T00:00:00Z",
-        "is_member": false,
-        "is_admin": false,
-        "is_active": true,
-        "is_staff": false,
-        "roles": []
-    }
-]
-```
+### Détails d'un utilisateur
+**GET** `http://127.0.0.1:8000/auth/admin/users/<id>/`  
+**Headers** : `Authorization: Bearer <ACCESS_TOKEN>`
 
-**Filtres optionnels** :
-- `?is_member=true` : Liste uniquement les utilisateurs approuvés
-- `?is_member=false` : Liste uniquement les utilisateurs en attente
+### Modifier un utilisateur
+**PATCH** `http://127.0.0.1:8000/auth/admin/users/<id>/`  
+**Headers** : `Authorization: Bearer <ACCESS_TOKEN>`
 
-**Exemple** : `http://127.0.0.1:8000/auth/admin/users/?is_member=false`
-
----
-
-### 3.2 Liste des utilisateurs en attente
-**Méthode** : `GET`  
-**URL** : `http://127.0.0.1:8000/auth/admin/users/pending/`  
-**Headers** :
-```
-Content-Type: application/json
-Authorization: Bearer <ACCESS_TOKEN>
-```
-
-**Réponse attendue** (200 OK) : Liste des utilisateurs avec `is_member=false`
-
----
-
-### 3.3 Liste des utilisateurs approuvés
-**Méthode** : `GET`  
-**URL** : `http://127.0.0.1:8000/auth/admin/users/approved/`  
-**Headers** :
-```
-Content-Type: application/json
-Authorization: Bearer <ACCESS_TOKEN>
-```
-
-**Réponse attendue** (200 OK) : Liste des utilisateurs avec `is_member=true`
-
----
-
-### 3.4 Détails d'un utilisateur spécifique
-**Méthode** : `GET`  
-**URL** : `http://127.0.0.1:8000/auth/admin/users/<user_id>/`  
-**Exemple** : `http://127.0.0.1:8000/auth/admin/users/2/`  
-**Headers** :
-```
-Content-Type: application/json
-Authorization: Bearer <ACCESS_TOKEN>
-```
-
-**Réponse attendue** (200 OK) :
+**Body (JSON)** :
 ```json
 {
-    "id": 2,
-    "matricule": "MAT001",
-    "nom": "Doe",
-    "prenom": "John",
-    "telephone": "1234567890",
-    "email": null,
-    "date_joined": "2024-01-01T00:00:00Z",
-    "is_member": false,
-    "is_admin": false,
-    "is_active": true,
-    "is_staff": false,
-    "roles": []
-}
-```
-
----
-
-### 3.5 Approuver un utilisateur
-**Méthode** : `PATCH`  
-**URL** : `http://127.0.0.1:8000/auth/admin/users/<user_id>/approve/`  
-**Exemple** : `http://127.0.0.1:8000/auth/admin/users/2/approve/`  
-**Headers** :
-```
-Content-Type: application/json
-Authorization: Bearer <ACCESS_TOKEN>
-```
-
-**Body** : Aucun body nécessaire (ou body vide `{}`)
-
-**Réponse attendue** (200 OK) :
-```json
-{
-    "message": "Utilisateur approuvé avec succès.",
-    "user": {
-        "id": 2,
-        "matricule": "MAT001",
-        "nom": "Doe",
-        "prenom": "John",
-        "telephone": "1234567890",
-        "email": null,
-        "date_joined": "2024-01-01T00:00:00Z",
-        "is_member": true,
-        "is_admin": false,
-        "is_active": true,
-        "is_staff": false,
-        "roles": []
-    }
-}
-```
-
----
-
-### 3.6 Désapprouver un utilisateur
-**Méthode** : `PATCH`  
-**URL** : `http://127.0.0.1:8000/auth/admin/users/<user_id>/disapprove/`  
-**Exemple** : `http://127.0.0.1:8000/auth/admin/users/2/disapprove/`  
-**Headers** :
-```
-Content-Type: application/json
-Authorization: Bearer <ACCESS_TOKEN>
-```
-
-**Body** : Aucun body nécessaire (ou body vide `{}`)
-
-**Réponse attendue** (200 OK) :
-```json
-{
-    "message": "Utilisateur désapprouvé avec succès.",
-    "user": {
-        "id": 2,
-        "matricule": "MAT001",
-        "nom": "Doe",
-        "prenom": "John",
-        "telephone": "1234567890",
-        "email": null,
-        "date_joined": "2024-01-01T00:00:00Z",
-        "is_member": false,
-        "is_admin": false,
-        "is_active": true,
-        "is_staff": false,
-        "roles": []
-    }
-}
-```
-
----
-
-## 🔑 ÉTAPE 4 : CONNEXION UTILISATEUR
-
-### 4.1 Tentative de connexion (utilisateur non approuvé)
-**Méthode** : `POST`  
-**URL** : `http://127.0.0.1:8000/login/`  
-**Headers** :
-```
-Content-Type: application/json
-```
-**Body (raw JSON)** :
-```json
-{
-    "matricule": "MAT001",
-    "password": "password123"
-}
-```
-
-**Réponse attendue** (403 Forbidden) :
-```json
-{
-    "detail": "Votre compte n'a pas encore été validé par l'administrateur."
-}
-```
-
----
-
-### 4.2 Connexion (utilisateur approuvé)
-**Méthode** : `POST`  
-**URL** : `http://127.0.0.1:8000/login/`  
-**Headers** :
-```
-Content-Type: application/json
-```
-**Body (raw JSON)** :
-```json
-{
-    "matricule": "MAT001",
-    "password": "password123"
-}
-```
-
-**Réponse attendue** (200 OK) :
-```json
-{
-    "id": 2,
-    "matricule": "MAT001",
-    "nom": "Doe",
-    "prenom": "John",
-    "telephone": "1234567890",
-    "email": null,
-    "date_joined": "2024-01-01T00:00:00Z",
+    "nom": "NouveauNom",
+    "prenom": "NouveauPrenom",
+    "telephone": "0987654321",
     "is_member": true,
-    "is_admin": false,
-    "is_active": true,
-    "is_staff": false,
-    "roles": [],
-    "tokens": {
-        "refresh": "eyJ0eXAiOiJKV1QiLCJhbGc...",
-        "access": "eyJ0eXAiOiJKV1QiLCJhbGc..."
-    }
+    "roles": [2, 3]
 }
 ```
 
+**Pour désactiver** : `{"is_member": false}`  
+**Pour activer** : `{"is_member": true}`
+
+### Importer des utilisateurs depuis Excel
+**POST** `http://127.0.0.1:8000/auth/admin/users/import-excel/`  
+**Headers** : `Authorization: Bearer <ACCESS_TOKEN>`
+
+**Body** : `form-data`
+- `file` (File) : Sélectionner le fichier Excel
+- `default_password` (Text, optionnel) : `Etudiant123`
+
+**Format Excel requis** :
+| matricule | nom | prenom | telephone |
+|-----------|-----|--------|-----------|
+| MAT001    | Doe | John   | 1234567890|
+
+**Réponse** : Un fichier Excel sera téléchargé avec les utilisateurs créés et leurs mots de passe.
+
 ---
 
-## 🔄 ÉTAPE 5 : GESTION DES TOKENS
+## 🔑 3. CONNEXION UTILISATEUR
 
-### 5.1 Rafraîchir le token
-**Méthode** : `POST`  
-**URL** : `http://127.0.0.1:8000/token/refresh/`  
-**Headers** :
-```
-Content-Type: application/json
-```
-**Body (raw JSON)** :
+**POST** `http://127.0.0.1:8000/login/`
+
+**Body (JSON)** :
 ```json
 {
-    "refresh": "eyJ0eXAiOiJKV1QiLCJhbGc..."
+    "matricule": "MAT001",
+    "password": "Etudiant123"
 }
 ```
 
-**Réponse attendue** (200 OK) :
+**Réponse** : Si `password_change_required: true`, l'utilisateur doit changer son mot de passe.
+
+---
+
+## 🔄 4. CHANGEMENT DE MOT DE PASSE
+
+**POST** `http://127.0.0.1:8000/change-password/`  
+**Headers** : `Authorization: Bearer <ACCESS_TOKEN>`
+
+**Body (JSON)** :
 ```json
 {
-    "access": "eyJ0eXAiOiJKV1QiLCJhbGc..."
+    "old_password": "Etudiant123",
+    "new_password": "MonNouveauMotDePasse123"
 }
 ```
 
 ---
 
-### 5.2 Déconnexion
-**Méthode** : `POST`  
-**URL** : `http://127.0.0.1:8000/logout/`  
-**Headers** :
-```
-Content-Type: application/json
-Authorization: Bearer <ACCESS_TOKEN>
-```
-**Body (raw JSON)** :
-```json
-{
-    "refresh": "eyJ0eXAiOiJKV1QiLCJhbGc..."
-}
-```
+## 👤 5. MES INFORMATIONS
 
-**Réponse attendue** (205 Reset Content) : Pas de contenu
+**GET** `http://127.0.0.1:8000/user/`  
+**Headers** : `Authorization: Bearer <ACCESS_TOKEN>`
 
----
+**PATCH** `http://127.0.0.1:8000/user/` (modifier)  
+**Headers** : `Authorization: Bearer <ACCESS_TOKEN>`
 
-## 👤 ÉTAPE 6 : INFORMATIONS UTILISATEUR
-
-### 6.1 Obtenir ses propres informations
-**Méthode** : `GET`  
-**URL** : `http://127.0.0.1:8000/user/`  
-**Headers** :
-```
-Content-Type: application/json
-Authorization: Bearer <ACCESS_TOKEN>
-```
-
-**Réponse attendue** (200 OK) : Informations de l'utilisateur connecté
-
----
-
-### 6.2 Modifier ses propres informations
-**Méthode** : `PATCH` ou `PUT`  
-**URL** : `http://127.0.0.1:8000/user/`  
-**Headers** :
-```
-Content-Type: application/json
-Authorization: Bearer <ACCESS_TOKEN>
-```
-**Body (raw JSON)** :
+**Body (JSON)** :
 ```json
 {
     "nom": "NouveauNom",
@@ -387,68 +114,62 @@ Authorization: Bearer <ACCESS_TOKEN>
 
 ---
 
-## 📋 SCÉNARIO DE TEST COMPLET
+## 🔄 6. TOKENS
 
-### Scénario 1 : Inscription et approbation complète
+### Rafraîchir le token
+**POST** `http://127.0.0.1:8000/token/refresh/`
 
-1. **Inscription** : `POST /register/` avec un nouvel utilisateur
-2. **Connexion Admin** : `POST /auth/admin/login/` (copier le token)
-3. **Voir les utilisateurs en attente** : `GET /auth/admin/users/pending/`
-4. **Approuver l'utilisateur** : `PATCH /auth/admin/users/<id>/approve/`
-5. **Connexion utilisateur** : `POST /login/` (devrait maintenant fonctionner)
+**Body (JSON)** :
+```json
+{
+    "refresh": "eyJ0eXAiOiJKV1QiLCJhbGc..."
+}
+```
 
-### Scénario 2 : Test de sécurité
+### Déconnexion
+**POST** `http://127.0.0.1:8000/logout/`  
+**Headers** : `Authorization: Bearer <ACCESS_TOKEN>`
 
-1. **Tentative de connexion non approuvée** : `POST /login/` (devrait échouer avec 403)
-2. **Tentative d'accès admin sans token** : `GET /auth/admin/users/` (devrait échouer avec 401)
-3. **Tentative d'accès admin avec token utilisateur** : `GET /auth/admin/users/` (devrait échouer avec 403)
+**Body (JSON)** :
+```json
+{
+    "refresh": "eyJ0eXAiOiJKV1QiLCJhbGc..."
+}
+```
+
+---
+
+## 📋 SCÉNARIO DE TEST
+
+1. **Connexion Admin** : `POST /auth/admin/login/` → Copier le token
+2. **Importer Excel** : `POST /auth/admin/users/import-excel/` → Télécharger le fichier Excel
+3. **Connexion utilisateur** : `POST /login/` avec matricule et mot de passe du fichier Excel
+4. **Changer mot de passe** : `POST /change-password/` si `password_change_required: true`
 
 ---
 
 ## ⚠️ NOTES IMPORTANTES
 
-1. **Créer un utilisateur admin** : Vous devez d'abord créer un utilisateur avec `is_admin=True` via Django shell ou Django admin
-   ```python
-   python manage.py shell
-   from accounts.models import CustomUser
-   admin = CustomUser.objects.create_user(
-       matricule="ADMIN001",
-       nom="Admin",
-       prenom="User",
-       telephone="0987654321",
-       password="adminpassword"
-   )
-   admin.is_admin = True
-   admin.is_member = True
-   admin.save()
-   ```
-
-2. **Token d'authentification** : Pour toutes les routes admin, vous devez inclure le header :
-   ```
-   Authorization: Bearer <votre_access_token>
-   ```
-
-3. **Format des dates** : Les dates sont au format ISO 8601 (ex: `2024-01-01T00:00:00Z`)
-
-4. **Codes de statut HTTP** :
-   - `200` : Succès
-   - `201` : Créé avec succès
-   - `205` : Succès sans contenu (logout)
-   - `400` : Requête invalide
-   - `401` : Non authentifié
-   - `403` : Non autorisé
-   - `404` : Non trouvé
+- **Admin par défaut** : `ADMIN001` / `adminpassword` (créé automatiquement)
+- **Rôle par défaut** : Tous les nouveaux utilisateurs reçoivent le rôle "étudiant"
+- **Champs cachés** : `is_superuser`, `is_staff`, `is_active`, `is_admin`, `password` ne sont jamais retournés
+- **Token** : Inclure `Authorization: Bearer <token>` pour toutes les routes admin
 
 ---
 
-## 🚀 DÉMARRAGE DU SERVEUR
+## 📞 ENDPOINTS
 
-Avant de tester, assurez-vous que le serveur Django est démarré :
+### Utilisateur
+- `POST /login/` - Connexion
+- `POST /change-password/` - Changer mot de passe
+- `GET /user/` - Mes informations
+- `PATCH /user/` - Modifier mes informations
+- `POST /logout/` - Déconnexion
+- `POST /token/refresh/` - Rafraîchir token
 
-```bash
-cd src
-python manage.py runserver
-```
-
-Le serveur sera accessible sur `http://127.0.0.1:8000`
-
+### Admin
+- `POST /auth/admin/login/` - Connexion admin
+- `GET /auth/admin/users/` - Liste utilisateurs
+- `GET /auth/admin/users/<id>/` - Détails utilisateur
+- `PATCH /auth/admin/users/<id>/` - Modifier utilisateur
+- `POST /auth/admin/users/import-excel/` - Importer Excel

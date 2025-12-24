@@ -12,6 +12,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 django.setup()
 
 from accounts.models import CustomUser
+from api.models import Role
 
 def create_admin():
     print("=" * 50)
@@ -29,16 +30,19 @@ def create_admin():
         print(f"\n❌ Erreur: Un utilisateur avec le matricule '{matricule}' existe déjà.")
         return
     
-    # Créer l'utilisateur admin
+    # Créer l'utilisateur admin avec rôle "admin" (sans superuser)
     try:
+        admin_role, _ = Role.objects.get_or_create(type="admin")
+
         admin = CustomUser.objects.create_user(
             matricule=matricule,
             nom=nom,
             prenom=prenom,
             telephone=telephone,
-            password=password
+            password=password,
         )
-        admin.is_admin = True
+        admin.roles.add(admin_role)
+        # On s'assure qu'il peut se connecter via l'API
         admin.is_member = True
         admin.save()
         
